@@ -10,12 +10,12 @@ resource "aws_codepipeline" "this" {
   # execution_mode = var.pipeline_execution_mode
 
   artifact_store {
-    location = aws_s3_bucket.codepipeline_bucket[0].bucket
+    location = try(var.codepipeline_artifact_bucket, null)
     type     = "S3"
-    encryption_key {
-      id   = aws_kms_key.encryption_key[0].arn
-      type = "KMS"
-    }
+    # encryption_key {
+    #   id   = aws_kms_key.encryption_key[0].arn
+    #   type = "KMS"
+    # }
   }
 
   stage {
@@ -54,32 +54,32 @@ resource "aws_codepipeline" "this" {
     }
   }
 
-  stage {
-    name = "Deploy"
+  # stage {
+  #   name = "Deploy"
 
-    action {
-      name            = "Deploy"
-      category        = "Deploy"
-      owner           = "AWS"
-      provider        = "ECS"
-      input_artifacts = ["BuildOutput"]
-      # output_artifacts = ["DeployOutput"] # no need for Amazon ECS
-      version   = "1"
-      run_order = 3
+  #   action {
+  #     name            = "Deploy"
+  #     category        = "Deploy"
+  #     owner           = "AWS"
+  #     provider        = "ECS"
+  #     input_artifacts = ["BuildOutput"]
+  #     # output_artifacts = ["DeployOutput"] # no need for Amazon ECS
+  #     version   = "1"
+  #     run_order = 3
 
-      configuration = {
-        ClusterName = var.ecs_cluster
-        ServiceName = var.ecs_service
-        FileName    = var.image_definition_file_name
-        # DeploymentTimeout = var.deployment_timeout
-      }
-    }
-  }
+  #     configuration = {
+  #       ClusterName = var.ecs_cluster
+  #       ServiceName = var.ecs_service
+  #       FileName    = var.image_definition_file_name
+  #       # DeploymentTimeout = var.deployment_timeout
+  #     }
+  #   }
+  # }
 
   tags = merge(
     { Name = "${local.name_prefix}-pipeline" },
     var.custom_tags
   )
 
-  depends_on = [data.aws_codestarconnections_connection.this, aws_iam_role.codepipeline_role, aws_s3_bucket.codepipeline_bucket]
+  depends_on = [data.aws_codestarconnections_connection.this]
 }

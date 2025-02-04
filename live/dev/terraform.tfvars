@@ -17,10 +17,10 @@ codebuild_description = "This is codebuild."
 // For production, set build_output_artifact_type = "CODEPIPELINE" and build_project_source_type = "CODEPIPELINE"
 
 # Artifact
-codebuild_build_output_artifact_type = "NO_ARTIFACTS"
+codebuild_build_output_artifact_type = "CODEPIPELINE"
 
 # source
-codebuild_build_project_source_type = "NO_SOURCE"
+codebuild_build_project_source_type = "CODEPIPELINE"
 
 codebuild_buildspec_file_location = "buildspec.yml" # file from the codecommit repo.
 
@@ -35,7 +35,7 @@ codebuild_privileged_mode             = false
 #================================
 # CodePipeline
 #================================
-create_codepipeline     = false
+create_codepipeline     = true
 github_repo_id          = "dhan-cloudtech/nodejs-apps-multi"
 github_repo_branch      = "main"
 codestarconnection_name = "dhan-github"

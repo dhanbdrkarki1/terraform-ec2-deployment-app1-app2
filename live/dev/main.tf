@@ -16,6 +16,10 @@ module "codepipeline" {
   # IAM Role
   codepipeline_service_role_arn = module.codepipeline_service_role.role_arn
 
+  # Artifact Bucket
+  codepipeline_artifact_bucket = module.codepipeline_artifact_bucket.bucket_arn
+
+  # Tags
   custom_tags = {
     Environment = var.environment
     Project     = var.project_name

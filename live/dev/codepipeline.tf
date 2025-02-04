@@ -68,8 +68,8 @@ module "codepipeline_service_role" {
           "s3:DeleteObject"
         ]
         Resource = [
-          "${aws_s3_bucket.codepipeline_bucket[0].arn}",
-          "${aws_s3_bucket.codepipeline_bucket[0].arn}/*"
+          "${module.codepipeline_artifact_bucket.bucket_arn}",
+          "${module.codepipeline_artifact_bucket.bucket_arn}/*"
         ]
       },
       {
@@ -81,7 +81,7 @@ module "codepipeline_service_role" {
           "kms:ReEncrypt*",
           "kms:Decrypt"
         ]
-        Resource = "${aws_kms_key.encryption_key[0].arn}"
+        Resource = "*"
       },
       {
         Action = [
@@ -234,62 +234,72 @@ module "codepipeline_service_role" {
 #================================
 # CodePipeline Artifcat Store
 #================================
-module "codebuild_artifact_bucket" {
+module "codepipeline_artifact_bucket" {
   source               = "../../modules/services/s3"
   create               = true
-  bucket_name          = "codebuild-logs"
-  enable_versioning    = true
+  bucket_name          = "codepipeline-artifact"
+  enable_versioning    = false
   force_destroy        = true
   create_bucket_policy = true
   bucket_policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
+    Version = "2012-10-17"
+    Id      = "SSEAndSSLPolicy"
+    Statement = [
       {
-        "Effect" : "Allow",
-        "Principal" : {
-          "Service" : "codebuild.amazonaws.com"
-        },
-        "Action" : [
+        Sid       = "DenyUnEncryptedObjectUploads"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:PutObject"
+        Resource  = "${module.codepipeline_artifact_bucket.bucket_arn}/*"
+        Condition = {
+          StringNotEquals = {
+            "s3:x-amz-server-side-encryption" = "aws:kms"
+          }
+        }
+      },
+      {
+        Sid       = "DenyInsecureConnections"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource  = "${module.codepipeline_artifact_bucket.bucket_arn}/*"
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      },
+      {
+        Sid    = "CodePipelineAccess"
+        Effect = "Allow"
+        Principal = {
+          Service = "codepipeline.amazonaws.com"
+        }
+        Action = [
           "s3:PutObject",
           "s3:GetObject",
           "s3:GetObjectVersion",
           "s3:ListBucket",
           "s3:GetBucketAcl",
           "s3:GetBucketLocation"
-        ],
-        "Resource" : [
-          "${module.codebuild_artifact_bucket.bucket_arn}",
-          "${module.codebuild_artifact_bucket.bucket_arn}/*"
+        ]
+        Resource = [
+          module.codepipeline_artifact_bucket.bucket_arn,
+          "${module.codepipeline_artifact_bucket.bucket_arn}/*"
         ]
       }
     ]
   })
 
+  # Block public access
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+
   custom_tags = {
     Project     = var.project_name
     Environment = var.environment
   }
 }
 
-
-# AWS CodePIpeline
-
-module "codepipeline" {
-  source = "../../modules/services/codepipeline"
-  create = var.create_codepipeline
-
-  # Github
-  source_repo_id          = var.github_repo_id
-  source_repo_branch      = var.github_repo_branch
-  codestarconnection_name = var.codestarconnection_name
-
-  # CodeBuild
-  codebuild_project_name = module.codebuild.name
-  codebuild_arn          = module.codebuild.arn
-
-
-  custom_tags = {
-    Environment = var.environment
-    Project     = var.project_name
-  }
-}

@@ -92,6 +92,13 @@ variable "codepipeline_service_role_arn" {
   default     = null
 }
 
+# Artifact Store
+variable "codepipeline_artifact_bucket" {
+  type        = string
+  description = "The S3 artifact bucket for CodePipeline"
+  default     = null
+}
+
 
 # Tags
 

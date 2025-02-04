@@ -40,7 +40,7 @@ resource "aws_codebuild_project" "this" {
     content {
       cloudwatch_logs {
         status     = "ENABLED"
-        group_name = try(codebuild_log_group_name, null)
+        group_name = try(var.codebuild_log_group_name, null)
         # stream_name = aws_cloudwatch_log_stream.this[0].name
       }
 
