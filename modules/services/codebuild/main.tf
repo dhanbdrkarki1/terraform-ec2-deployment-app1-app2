@@ -63,14 +63,6 @@ resource "aws_codebuild_project" "this" {
       fetch_submodules = var.fetch_submodules
     }
 
-    dynamic "auth" {
-      for_each = var.source_auth != null ? [var.source_auth] : []
-      content {
-        type     = auth.value.type
-        resource = auth.value.resource
-      }
-    }
-
     dynamic "build_status_config" {
       for_each = var.build_status_config != null ? [var.build_status_config] : []
       content {
