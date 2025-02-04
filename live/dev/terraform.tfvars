@@ -26,7 +26,7 @@ codebuild_buildspec_file_location = "buildspec.yml" # file from the codecommit r
 
 # Environment
 codebuild_compute_type                = "BUILD_GENERAL1_SMALL"
-codebuild_image                       = "aws/codebuild/amazonlinux2-x86_64-standard:5.0"
+codebuild_image                       = "aws/codebuild/standard:7.0"
 codebuild_type                        = "LINUX_CONTAINER"
 codebuild_image_pull_credentials_type = "CODEBUILD"
 codebuild_privileged_mode             = false

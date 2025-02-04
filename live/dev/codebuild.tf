@@ -151,7 +151,7 @@ module "codebuild" {
   codebuild_log_group_name = module.codebuild_log_group.log_group_name
 
 
-  // For testing, set build_output_artifact_type = "NO_ARTIFACTS" and build_project_source_type = "NO_SOURCE"
+  // For testing, set build_output_artifact_type = "NO_ARTIFACTS", build_project_source_type = "NO_SOURCE" and comment source_location.
   // For production, set build_output_artifact_type = "CODEPIPELINE" and build_project_source_type = "CODEPIPELINE"
 
   # Artifact
@@ -165,11 +165,6 @@ module "codebuild" {
   git_clone_depth           = 1
   report_build_status       = true
   fetch_submodules          = true
-
-  # source_auth = {
-  #   type     = "OAUTH"
-  #   resource = "github_token"
-  # }
 
   build_status_config = {
     context    = "continuous-integration/codebuild"
