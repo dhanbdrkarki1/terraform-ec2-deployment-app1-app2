@@ -3,7 +3,7 @@ output "application_arn" {
 }
 
 output "application_name" {
-  value = try(aws_codedeploy_app.this[0].app_name, null)
+  value = try(aws_codedeploy_app.this[0].name, null)
 }
 
 output "deployment_group_arn" {

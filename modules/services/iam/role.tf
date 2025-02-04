@@ -35,10 +35,10 @@ resource "aws_iam_role" "this" {
 
 # IAM Policy
 resource "aws_iam_policy" "this" {
-  count       = var.create && var.policy_document != "" ? 1 : 0
+  count       = var.create && var.policy_document != null ? 1 : 0
   name        = var.policy_name != "" ? "${local.name_prefix}-${var.policy_name}" : "${local.name_prefix}-${var.role_name}"
-  description = var.policy_description
-  policy      = var.policy_document
+  description = try(var.policy_description, null)
+  policy      = try(var.policy_document, null)
 
   tags = merge(
     { Name = var.policy_name != "" ? var.policy_name : var.role_name },
@@ -49,9 +49,9 @@ resource "aws_iam_policy" "this" {
 
 # Attach IAM Policy to IAM Role
 resource "aws_iam_role_policy_attachment" "this" {
-  count      = var.create ? 1 : 0
-  role       = aws_iam_role.this[0].name
-  policy_arn = aws_iam_policy.this[0].arn
+  count      = var.create && var.policy_document != null ? 1 : 0
+  role       = try(aws_iam_role.this[0].name, null)
+  policy_arn = try(aws_iam_policy.this[0].arn, null)
 
   depends_on = [aws_iam_role.this, aws_iam_policy.this] # Ensure role and policy are created first
 }
