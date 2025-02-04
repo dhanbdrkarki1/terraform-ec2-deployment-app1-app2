@@ -85,6 +85,14 @@ variable "deployment_timeout" {
   type        = number
 }
 
+# IAM Role
+variable "codepipeline_service_role_arn" {
+  type        = string
+  description = "The ARN of the IAM role that enables AWS CodePipeline to interact with dependent AWS services on behalf of the AWS account."
+  default     = null
+}
+
+
 # Tags
 
 variable "custom_tags" {

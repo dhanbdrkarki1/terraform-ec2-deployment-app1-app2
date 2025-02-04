@@ -13,6 +13,8 @@ module "codepipeline" {
   codebuild_project_name = module.codebuild.name
   codebuild_arn          = module.codebuild.arn
 
+  # IAM Role
+  codepipeline_service_role_arn = module.codepipeline_service_role.role_arn
 
   custom_tags = {
     Environment = var.environment
