@@ -3,11 +3,11 @@ locals {
 }
 
 resource "aws_codepipeline" "this" {
-  count    = var.create ? 1 : 0
-  name     = "${local.name_prefix}-pipeline"
-  role_arn = try(var.codepipeline_service_role_arn, null)
-  # pipeline_type  = var.pipeline_type
-  # execution_mode = var.pipeline_execution_mode
+  count          = var.create ? 1 : 0
+  name           = "${local.name_prefix}-pipeline"
+  role_arn       = try(var.codepipeline_service_role_arn, null)
+  pipeline_type  = var.pipeline_type
+  execution_mode = var.pipeline_execution_mode
 
   artifact_store {
     location = try(var.codepipeline_artifact_bucket, null)

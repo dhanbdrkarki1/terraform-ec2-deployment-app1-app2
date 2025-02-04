@@ -232,7 +232,7 @@ module "codepipeline_service_role" {
 
 
 #================================
-# CodePipeline Artifcat Store
+# CodePipeline Artifact Store
 #================================
 module "codepipeline_artifact_bucket" {
   source               = "../../modules/services/s3"

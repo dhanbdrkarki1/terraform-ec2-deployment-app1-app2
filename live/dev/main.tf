@@ -17,7 +17,11 @@ module "codepipeline" {
   codepipeline_service_role_arn = module.codepipeline_service_role.role_arn
 
   # Artifact Bucket
-  codepipeline_artifact_bucket = module.codepipeline_artifact_bucket.bucket_arn
+  codepipeline_artifact_bucket = module.codepipeline_artifact_bucket.bucket_name
+
+  # Pipeline
+  pipeline_type           = "V2"
+  pipeline_execution_mode = "QUEUED"
 
   # Tags
   custom_tags = {

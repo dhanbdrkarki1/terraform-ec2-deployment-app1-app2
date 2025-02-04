@@ -37,7 +37,8 @@ module "codebuild_service_role" {
         ]
         Resource = [
           module.codebuild_artifact_bucket.bucket_arn,
-          "${module.codebuild_artifact_bucket.bucket_arn}/*"
+          "${module.codebuild_artifact_bucket.bucket_arn}/*",
+          "${module.codepipeline_artifact_bucket.bucket_arn}/*"
         ]
       },
       # CloudWatch Logs permissions
@@ -158,9 +159,8 @@ module "codebuild" {
   build_output_artifact_type = var.codebuild_build_output_artifact_type
 
   # source
-
-  build_project_source_type = "GITHUB"
-  buildspec_file_location   = "buildspec.yml"
+  build_project_source_type = var.codebuild_build_project_source_type
+  buildspec_file_location   = var.codebuild_buildspec_file_location
   source_location           = "https://github.com/dhan-cloudtech/nodejs-apps-multi.git"
   git_clone_depth           = 1
   report_build_status       = true
