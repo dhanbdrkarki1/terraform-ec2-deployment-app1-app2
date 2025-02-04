@@ -98,6 +98,57 @@ variable "buildspec_file_location" {
   default     = "buildspec.yaml"
 }
 
+
+variable "source_location" {
+  description = "Location of the source code"
+  type        = string
+  default     = null
+}
+
+variable "git_clone_depth" {
+  description = "Git clone depth. Valid values between 0 and 100"
+  type        = number
+  default     = 1
+}
+
+variable "insecure_ssl" {
+  description = "Ignore SSL warnings when connecting to source control"
+  type        = bool
+  default     = false
+}
+
+variable "report_build_status" {
+  description = "Report build status back to source provider"
+  type        = bool
+  default     = false
+}
+
+variable "fetch_submodules" {
+  description = "Whether to fetch Git submodules"
+  type        = bool
+  default     = false
+}
+
+variable "source_auth" {
+  description = "Authentication configuration for source provider"
+  type = object({
+    type     = string
+    resource = string
+  })
+  default = null
+}
+
+variable "build_status_config" {
+  description = "Build status configuration"
+  type = object({
+    context    = string
+    target_url = string
+  })
+  default = null
+}
+
+
+
 # IAM Role
 variable "codebuild_service_role_arn" {
   type        = string

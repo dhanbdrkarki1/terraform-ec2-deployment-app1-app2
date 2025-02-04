@@ -52,9 +52,34 @@ resource "aws_codebuild_project" "this" {
   }
 
   source {
-    type      = var.build_project_source_type
-    buildspec = var.buildspec_file_location
+    type                = var.build_project_source_type
+    buildspec           = var.buildspec_file_location
+    location            = var.source_location
+    git_clone_depth     = var.git_clone_depth
+    insecure_ssl        = var.insecure_ssl
+    report_build_status = var.report_build_status
+
+    git_submodules_config {
+      fetch_submodules = var.fetch_submodules
+    }
+
+    dynamic "auth" {
+      for_each = var.source_auth != null ? [var.source_auth] : []
+      content {
+        type     = auth.value.type
+        resource = auth.value.resource
+      }
+    }
+
+    dynamic "build_status_config" {
+      for_each = var.build_status_config != null ? [var.build_status_config] : []
+      content {
+        context    = build_status_config.value.context
+        target_url = build_status_config.value.target_url
+      }
+    }
   }
+
 
   tags = merge(
     { Name = "${local.name_prefix}" },

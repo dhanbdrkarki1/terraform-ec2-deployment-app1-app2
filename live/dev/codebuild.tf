@@ -146,6 +146,7 @@ module "codebuild" {
   # Artifact Bucket
   bucket_name = module.codebuild_artifact_bucket.bucket_name
   bucket_id   = module.codebuild_artifact_bucket.bucket_id
+
   # Log group
   codebuild_log_group_name = module.codebuild_log_group.log_group_name
 
@@ -157,9 +158,23 @@ module "codebuild" {
   build_output_artifact_type = var.codebuild_build_output_artifact_type
 
   # source
-  build_project_source_type = var.codebuild_build_project_source_type
 
-  buildspec_file_location = var.codebuild_buildspec_file_location # file from the codecommit repo.
+  build_project_source_type = "GITHUB"
+  buildspec_file_location   = "buildspec.yml"
+  source_location           = "https://github.com/dhan-cloudtech/nodejs-apps-multi.git"
+  git_clone_depth           = 1
+  report_build_status       = true
+  fetch_submodules          = true
+
+  # source_auth = {
+  #   type     = "OAUTH"
+  #   resource = "github_token"
+  # }
+
+  build_status_config = {
+    context    = "continuous-integration/codebuild"
+    target_url = "https://console.aws.amazon.com/codebuild/home"
+  }
 
   # Environment
   compute_type                = var.codebuild_compute_type
