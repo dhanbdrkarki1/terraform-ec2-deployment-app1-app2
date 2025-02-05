@@ -147,7 +147,7 @@ variable "archive_policy" {
 variable "create_topic_policy" {
   description = "Determines whether an SNS topic policy is created"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "source_topic_policy_documents" {
@@ -165,7 +165,7 @@ variable "override_topic_policy_documents" {
 variable "enable_default_topic_policy" {
   description = "Specifies whether to enable the default topic policy. Defaults to `true`"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "topic_policy_statements" {

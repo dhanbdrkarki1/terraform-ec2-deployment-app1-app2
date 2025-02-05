@@ -35,19 +35,31 @@ module "codepipeline_service_role" {
           StringEqualsIfExists = {
             "iam:PassedToService" = [
               "cloudformation.amazonaws.com",
-              "elasticbeanstalk.amazonaws.com",
-              "ec2.amazonaws.com",
-              "ecs-tasks.amazonaws.com"
+              "ec2.amazonaws.com"
             ]
           }
         }
+      },
+      # Approval Policy
+      {
+        Sid    = "CodePipelineApprovalPolicy"
+        Effect = "Allow"
+        Action = [
+          "codepipeline:ListPipelines",
+          "codepipeline:GetPipeline",
+          "codepipeline:GetPipelineState",
+          "codepipeline:GetPipelineExecution",
+          "codepipeline:ListActionExecutions",
+          "codepipeline:PutApprovalResult"
+        ]
+        Resource = "*"
       },
       # SNS Notification
       {
         Sid      = "CodePipelineSNSPublishPolicy"
         Effect   = "Allow"
         Action   = "sns:Publish"
-        Resource = "${module.sns_notification.topic_arn}/*"
+        Resource = [module.sns_notification.topic_arn]
       },
       {
         Effect = "Allow"
@@ -99,30 +111,11 @@ module "codepipeline_service_role" {
       },
       {
         Action = [
-          "elasticbeanstalk:*",
           "ec2:*",
           "elasticloadbalancing:*",
           "autoscaling:*",
           "cloudwatch:*",
-          # "sns:*",
           "cloudformation:*",
-          "rds:*",
-          "sqs:*",
-          "ecs:*"
-        ]
-        Resource = "*"
-        Effect   = "Allow"
-      },
-      {
-        Action = [
-          "opsworks:CreateDeployment",
-          "opsworks:DescribeApps",
-          "opsworks:DescribeCommands",
-          "opsworks:DescribeDeployments",
-          "opsworks:DescribeInstances",
-          "opsworks:DescribeStacks",
-          "opsworks:UpdateApp",
-          "opsworks:UpdateStack"
         ]
         Resource = "*"
         Effect   = "Allow"
@@ -156,29 +149,6 @@ module "codepipeline_service_role" {
       {
         Effect = "Allow"
         Action = [
-          "devicefarm:ListProjects",
-          "devicefarm:ListDevicePools",
-          "devicefarm:GetRun",
-          "devicefarm:GetUpload",
-          "devicefarm:CreateUpload",
-          "devicefarm:ScheduleRun"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "servicecatalog:ListProvisioningArtifacts",
-          "servicecatalog:CreateProvisioningArtifact",
-          "servicecatalog:DescribeProvisioningArtifact",
-          "servicecatalog:DeleteProvisioningArtifact",
-          "servicecatalog:UpdateProduct"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
           "cloudformation:ValidateTemplate"
         ]
         Resource = "*"
@@ -187,24 +157,6 @@ module "codepipeline_service_role" {
         Effect = "Allow"
         Action = [
           "ecr:DescribeImages"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "states:DescribeExecution",
-          "states:DescribeStateMachine",
-          "states:StartExecution"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "appconfig:StartDeployment",
-          "appconfig:StopDeployment",
-          "appconfig:GetDeployment"
         ]
         Resource = "*"
       }
@@ -306,21 +258,27 @@ module "sns_notification" {
     }
   ]
 
-  # # policy to allow CodePipeline to publish to this topic
-  # topic_policy_statements = jsonencode({
-  #   Version = "2012-10-17"
-  #   Statement = [
-  #     {
-  #       Sid    = "AllowCodePipelineToPublish"
-  #       Effect = "Allow"
-  #       Principal = {
-  #         Service = "codepipeline.amazonaws.com"
-  #       }
-  #       Action   = "SNS:Publish"
-  #       Resource = "*"
-  #     }
-  #   ]
-  # })
+  # enable_default_topic_policy = true
+  create_topic_policy = true
+  topic_policy_statements = {
+    allow_codepipeline = {
+      sid    = "AllowCodePipelineToPublish"
+      effect = "Allow"
+      principals = [{
+        type        = "Service"
+        identifiers = ["codepipeline.amazonaws.com"]
+      }]
+      actions  = ["sns:Publish"]
+      resource = module.sns_notification.topic_arn
+      condition = {
+        ArnEquals = {
+          "aws:SourceArn" = [
+            module.codepipeline.arn
+          ]
+        }
+      }
+    }
+  }
 
   custom_tags = {
     Environment = var.environment
@@ -388,8 +346,9 @@ module "codepipeline" {
         run_order = 1
         configuration = {
           CustomData = "Please review the build output and approve if everything looks correct"
-          # Optional: Add SNS topic ARN if you want email notifications
-          # NotificationArn = "arn:aws:sns:region:account-id:topic-name"
+          # SNS topic ARN
+          NotificationArn    = try(module.sns_notification.topic_arn, null)
+          ExternalEntityLink = "https://console.aws.amazon.com/codesuite/codebuild/projects/${try(module.codebuild.name, null)}" # Optional: Link to your build results
         }
       }
     },
