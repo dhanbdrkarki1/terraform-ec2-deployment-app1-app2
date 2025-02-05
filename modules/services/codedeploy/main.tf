@@ -206,6 +206,7 @@ resource "aws_codedeploy_deployment_group" "this" {
   # }
 
   outdated_instances_strategy = var.outdated_instances_strategy
+  depends_on                  = [aws_codedeploy_app.this]
 
   tags = merge(
     { Name = "${local.name_prefix}-dg" },

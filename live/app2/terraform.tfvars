@@ -1,7 +1,7 @@
 #================================
 # Global
 #================================
-project_name       = "dhan-todo-app"
+project_name       = "hello-app"
 environment        = "dev"
 aws_region         = "us-east-2"
 availability_zones = ["us-east-2a", "us-east-2b"]
@@ -36,6 +36,6 @@ codebuild_privileged_mode             = false
 # CodePipeline
 #================================
 create_codepipeline    = true
-github_repo_id         = "dhan-cloudtech/nodejs-apps-multi"
+github_repo_id         = "dhan-cloudtech/node-app2"
 github_repo_branch     = "main"
 codestarconnection_arn = "arn:aws:codeconnections:us-east-2:664418970145:connection/6f538089-8632-4e91-9797-9f84787bf181"
