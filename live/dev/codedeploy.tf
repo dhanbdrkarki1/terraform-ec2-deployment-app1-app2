@@ -63,15 +63,19 @@ module "codedeploy" {
 
   # Deployment settings
   deployment_style = {
-    deployment_option = "WITH_TRAFFIC_CONTROL"
+    deployment_option = "WITHOUT_TRAFFIC_CONTROL" # if Load balancer, use WITH_TRAFFIC_CONTROL.
     deployment_type   = "IN_PLACE"
   }
 
+  #######################################
+  #** Causing AWS Provider Pluging Crash
   # Auto rollback configuration
-  auto_rollback_configuration = {
-    enabled = true
-    events  = ["DEPLOYMENT_FAILURE"]
-  }
+  # auto_rollback_configuration = {
+  #   enabled = true
+  #   events  = ["DEPLOYMENT_FAILURE"]
+  # }
+  #######################################
+
 
   # # Alarm configuration (optional)
   # alarm_configuration = {
