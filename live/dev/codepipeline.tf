@@ -303,3 +303,40 @@ module "codepipeline_artifact_bucket" {
   }
 }
 
+#================================
+# AWS CodePipeline
+#================================
+
+module "codepipeline" {
+  source = "../../modules/services/codepipeline"
+  create = var.create_codepipeline
+
+  # Github
+  source_repo_id          = var.github_repo_id
+  source_repo_branch      = var.github_repo_branch
+  codestarconnection_name = var.codestarconnection_name
+
+  # CodeBuild
+  codebuild_project_name = module.codebuild.name
+  codebuild_arn          = module.codebuild.arn
+
+  # CodeDeploy
+  codedeploy_application_name      = module.codedeploy.application_name
+  codedeploy_deployment_group_name = module.codedeploy.deployment_group_name
+
+  # IAM Role
+  codepipeline_service_role_arn = module.codepipeline_service_role.role_arn
+
+  # Artifact Bucket
+  codepipeline_artifact_bucket = module.codepipeline_artifact_bucket.bucket_name
+
+  # Pipeline
+  pipeline_type           = "V2"
+  pipeline_execution_mode = "QUEUED"
+
+  # Tags
+  custom_tags = {
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}

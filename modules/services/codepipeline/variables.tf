@@ -1,5 +1,5 @@
 ####################
-# AWS CodeBuild
+# AWS CodePipeline
 ####################
 
 variable "create" {
@@ -29,7 +29,9 @@ variable "pipeline_execution_mode" {
   }
 }
 
-# Github Code
+####################
+#  Github Code
+####################
 variable "source_repo_id" {
   description = "Source repo ID of the Github repository"
   type        = string
@@ -48,17 +50,35 @@ variable "codestarconnection_name" {
   default     = null
 }
 
-#CodeBuild
+####################
+#  AWS CodeBuild
+####################
 variable "codebuild_project_name" {
   description = "The name of the CodeBuild project"
   type        = string
+  default     = null
 }
 
 variable "codebuild_arn" {
   description = "The ARN of the CodeBuild project."
   type        = string
+  default     = null
 }
 
+####################
+#  AWS CodeDeploy
+####################
+variable "codedeploy_application_name" {
+  description = "The name of the CodeDeploy application"
+  type        = string
+  default     = null
+}
+
+variable "codedeploy_deployment_group_name" {
+  description = "The name of the CodeDeploy deployment group"
+  type        = string
+  default     = null
+}
 
 # Amazon ECS Standalone Deployment
 variable "ecs_cluster" {
