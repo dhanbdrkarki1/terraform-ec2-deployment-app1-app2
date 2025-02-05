@@ -9,9 +9,9 @@ terraform {
   backend "s3" {
     key    = "dev/services/terraform.tfstate"
     region = "us-east-2"
-    bucket = "dhan-cicd-dev-remote-state"
+    bucket = "dhan-hello-app-dev-remote-state"
     # for state locking
-    dynamodb_table = "dhan-cicd-dev-terraform-state-lock"
+    dynamodb_table = "dhan-hello-app-dev-terraform-state-lock"
     encrypt        = true
     profile        = "cloudtech"
   }

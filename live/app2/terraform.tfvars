@@ -1,7 +1,7 @@
 #================================
 # Global
 #================================
-project_name       = "hello-app"
+project_name       = "dhan-hello-app"
 environment        = "dev"
 aws_region         = "us-east-2"
 availability_zones = ["us-east-2a", "us-east-2b"]
