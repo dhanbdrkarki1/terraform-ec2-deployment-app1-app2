@@ -42,17 +42,12 @@ module "codepipeline_service_role" {
           }
         }
       },
+      # SNS Notification
       {
-        Action = [
-          "codecommit:CancelUploadArchive",
-          "codecommit:GetBranch",
-          "codecommit:GetCommit",
-          "codecommit:GetRepository",
-          "codecommit:GetUploadArchiveStatus",
-          "codecommit:UploadArchive"
-        ]
-        Resource = "*"
+        Sid      = "CodePipelineSNSPublishPolicy"
         Effect   = "Allow"
+        Action   = "sns:Publish"
+        Resource = "${module.sns_notification.topic_arn}/*"
       },
       {
         Effect = "Allow"
@@ -109,19 +104,11 @@ module "codepipeline_service_role" {
           "elasticloadbalancing:*",
           "autoscaling:*",
           "cloudwatch:*",
-          "sns:*",
+          # "sns:*",
           "cloudformation:*",
           "rds:*",
           "sqs:*",
           "ecs:*"
-        ]
-        Resource = "*"
-        Effect   = "Allow"
-      },
-      {
-        Action = [
-          "lambda:InvokeFunction",
-          "lambda:ListFunctions"
         ]
         Resource = "*"
         Effect   = "Allow"
@@ -302,6 +289,45 @@ module "codepipeline_artifact_bucket" {
     Environment = var.environment
   }
 }
+
+#================================
+# SNS Notification
+#================================
+module "sns_notification" {
+  source       = "../../modules/services/sns"
+  create       = true
+  name         = "codepipeline-sns-topic"
+  display_name = "codepipeline-sns-topic"
+
+  subscriptions = [
+    {
+      protocol = "email"
+      endpoint = "dhan@cloudtechservice.com"
+    }
+  ]
+
+  # # policy to allow CodePipeline to publish to this topic
+  # topic_policy_statements = jsonencode({
+  #   Version = "2012-10-17"
+  #   Statement = [
+  #     {
+  #       Sid    = "AllowCodePipelineToPublish"
+  #       Effect = "Allow"
+  #       Principal = {
+  #         Service = "codepipeline.amazonaws.com"
+  #       }
+  #       Action   = "SNS:Publish"
+  #       Resource = "*"
+  #     }
+  #   ]
+  # })
+
+  custom_tags = {
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
+
 
 #================================
 # AWS CodePipeline

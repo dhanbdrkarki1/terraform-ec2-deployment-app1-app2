@@ -47,7 +47,7 @@ resource "aws_sns_topic" "this" {
 
   archive_policy = try(var.archive_policy, null)
 
-  tags = var.tags
+  tags = var.custom_tags
 }
 
 ################################################################################
