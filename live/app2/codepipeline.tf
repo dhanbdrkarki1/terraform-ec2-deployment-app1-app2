@@ -352,6 +352,22 @@ module "codepipeline" {
       }
     },
     {
+      name = "Approval"
+      action = {
+        name      = "Approval"
+        category  = "Approval"
+        owner     = "AWS"
+        provider  = "Manual"
+        version   = "1"
+        run_order = 1
+        configuration = {
+          CustomData = "Please review the build output and approve if everything looks correct"
+          # Optional: Add SNS topic ARN if you want email notifications
+          # NotificationArn = "arn:aws:sns:region:account-id:topic-name"
+        }
+      }
+    },
+    {
       name = "Deploy"
       action = {
         name            = "Deploy"
