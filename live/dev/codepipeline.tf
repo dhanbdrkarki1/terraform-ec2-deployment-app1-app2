@@ -310,29 +310,64 @@ module "codepipeline_artifact_bucket" {
 module "codepipeline" {
   source = "../../modules/services/codepipeline"
   create = var.create_codepipeline
-
-  # Github
-  source_repo_id          = var.github_repo_id
-  source_repo_branch      = var.github_repo_branch
-  codestarconnection_name = var.codestarconnection_name
-
-  # CodeBuild
-  codebuild_project_name = module.codebuild.name
-  codebuild_arn          = module.codebuild.arn
-
-  # CodeDeploy
-  codedeploy_application_name      = module.codedeploy.application_name
-  codedeploy_deployment_group_name = module.codedeploy.deployment_group_name
-
-  # IAM Role
-  codepipeline_service_role_arn = module.codepipeline_service_role.role_arn
-
-  # Artifact Bucket
-  codepipeline_artifact_bucket = module.codepipeline_artifact_bucket.bucket_name
-
   # Pipeline
   pipeline_type           = "V2"
   pipeline_execution_mode = "QUEUED"
+  # CodePipeline Artifact Bucket
+  codepipeline_artifact_bucket = module.codepipeline_artifact_bucket.bucket_name
+  # CodePipeline IAM Role
+  codepipeline_service_role_arn = module.codepipeline_service_role.role_arn
+
+  stages = [
+    {
+      name = "Source"
+      action = {
+        name     = "Source"
+        category = "Source"
+        owner    = "AWS"
+        provider = "CodeStarSourceConnection"
+        version  = "1"
+        configuration = {
+          ConnectionArn    = var.codestarconnection_arn
+          FullRepositoryId = var.github_repo_id
+          BranchName       = var.github_repo_branch
+        }
+        output_artifacts = ["SourceOutput"]
+      }
+    },
+    {
+      name = "Build"
+      action = {
+        name             = "Build"
+        category         = "Build"
+        owner            = "AWS"
+        provider         = "CodeBuild"
+        version          = "1"
+        input_artifacts  = ["SourceOutput"]
+        output_artifacts = ["BuildOutput"]
+        run_order        = 2
+        configuration = {
+          ProjectName = module.codebuild.name
+        }
+      }
+    },
+    {
+      name = "Deploy"
+      action = {
+        name            = "Deploy"
+        category        = "Deploy"
+        owner           = "AWS"
+        provider        = "CodeDeploy"
+        version         = "1"
+        input_artifacts = ["BuildOutput"]
+        run_order       = 3
+        configuration = {
+          ApplicationName     = module.codedeploy.application_name
+          DeploymentGroupName = module.codedeploy.deployment_group_name
+        }
+      }
+    }
+  ]
 
   # Tags
   custom_tags = {

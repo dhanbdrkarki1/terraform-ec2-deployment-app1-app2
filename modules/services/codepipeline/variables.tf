@@ -1,7 +1,6 @@
 ####################
 # AWS CodePipeline
 ####################
-
 variable "create" {
   default     = false
   type        = bool
@@ -29,80 +28,44 @@ variable "pipeline_execution_mode" {
   }
 }
 
-####################
-#  Github Code
-####################
-variable "source_repo_id" {
-  description = "Source repo ID of the Github repository"
+variable "codepipeline_artifact_bucket" {
   type        = string
+  description = "The S3 artifact bucket for CodePipeline"
   default     = null
 }
 
-variable "source_repo_branch" {
-  description = "Default branch in the Source repo for which CodePipeline needs to be configured"
+variable "enable_kms_encryption" {
+  description = "Flag to enable KMS encryption for the artifact store"
+  type        = bool
+  default     = false
+}
+
+variable "kms_encryption_key_arn" {
   type        = string
+  description = <<-DOC
+    The encryption key block AWS CodePipeline uses to encrypt the data in the artifact store, such as an AWS Key Management Service (AWS KMS) key. 
+    If you don't specify a key, AWS CodePipeline uses the default key for Amazon Simple Storage Service (Amazon S3). 
+  DOC
   default     = null
 }
 
-variable "codestarconnection_name" {
-  description = "The name of the connection to be created"
-  type        = string
-  default     = null
-}
-
-####################
-#  AWS CodeBuild
-####################
-variable "codebuild_project_name" {
-  description = "The name of the CodeBuild project"
-  type        = string
-  default     = null
-}
-
-variable "codebuild_arn" {
-  description = "The ARN of the CodeBuild project."
-  type        = string
-  default     = null
-}
-
-####################
-#  AWS CodeDeploy
-####################
-variable "codedeploy_application_name" {
-  description = "The name of the CodeDeploy application"
-  type        = string
-  default     = null
-}
-
-variable "codedeploy_deployment_group_name" {
-  description = "The name of the CodeDeploy deployment group"
-  type        = string
-  default     = null
-}
-
-# Amazon ECS Standalone Deployment
-variable "ecs_cluster" {
-  description = "The name of the ECS cluster where to deploy"
-  type        = string
-  default     = null
-}
-
-variable "ecs_service" {
-  description = "The name of the ECS service to deploy"
-  type        = string
-  default     = null
-}
-
-variable "image_definition_file_name" {
-  description = "The name of the ECS service to deploy"
-  type        = string
-  default     = "imagedefinitions.json"
-}
-
-variable "deployment_timeout" {
-  description = "The Amazon ECS deployment action timeout in minutes. "
-  default     = 15
-  type        = number
+variable "stages" {
+  description = "A list of stages for the AWS CodePipeline, where each stage contains an action with its configuration details."
+  type = list(object({
+    name = string
+    action = object({
+      name             = string                 # Name of the action within the stage
+      category         = string                 # The category of the action (e.g., Source, Build, Deploy)
+      owner            = string                 # The owner of the action (e.g., AWS, ThirdParty, Custom)
+      provider         = string                 # The service provider for the action (e.g., CodeBuild, S3, Lambda)
+      version          = string                 # The version of the action provider
+      configuration    = map(string)            # Key-value pairs of action-specific configuration settings
+      input_artifacts  = optional(list(string)) # List of input artifacts for the action
+      output_artifacts = optional(list(string)) # List of output artifacts for the action
+      run_order        = optional(number, 1)    # The order in which the action runs within the stage (default: 1)
+    })
+  }))
+  default = []
 }
 
 # IAM Role
@@ -112,16 +75,7 @@ variable "codepipeline_service_role_arn" {
   default     = null
 }
 
-# Artifact Store
-variable "codepipeline_artifact_bucket" {
-  type        = string
-  description = "The S3 artifact bucket for CodePipeline"
-  default     = null
-}
-
-
 # Tags
-
 variable "custom_tags" {
   description = "Custom tags to set on all the resources."
   type        = map(string)

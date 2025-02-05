@@ -35,7 +35,7 @@ codebuild_privileged_mode             = false
 #================================
 # CodePipeline
 #================================
-create_codepipeline     = true
-github_repo_id          = "dhan-cloudtech/nodejs-apps-multi"
-github_repo_branch      = "main"
-codestarconnection_name = "dhan-github"
+create_codepipeline    = true
+github_repo_id         = "dhan-cloudtech/nodejs-apps-multi"
+github_repo_branch     = "main"
+codestarconnection_arn = "arn:aws:codeconnections:us-east-2:664418970145:connection/6f538089-8632-4e91-9797-9f84787bf181"

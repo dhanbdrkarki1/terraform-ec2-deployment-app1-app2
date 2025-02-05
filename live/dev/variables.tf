@@ -125,8 +125,8 @@ variable "github_repo_branch" {
   default     = null
 }
 
-variable "codestarconnection_name" {
-  description = "The name of the connection to be created"
+variable "codestarconnection_arn" {
+  description = "The ARN of the codestar connection Ato be used."
   type        = string
   default     = null
 }
