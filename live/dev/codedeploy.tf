@@ -53,7 +53,7 @@ module "codedeploy" {
     {
       ec2_tag_filter = [
         {
-          key   = "Project"
+          key   = "Name"
           type  = "KEY_AND_VALUE"
           value = "dhan-nodejs"
         }
