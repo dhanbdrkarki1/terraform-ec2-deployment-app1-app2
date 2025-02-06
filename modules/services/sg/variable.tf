@@ -104,6 +104,10 @@ variable "rules" {
     # react
     react-3000-tcp = [3000, 3000, "tcp", "React"]
 
+    # Monitoring
+    prometheus-9090-tcp    = [9090, 9090, "tcp", "Prometheus Monitoring"]
+    grafana-3000-tcp       = [3000, 3000, "tcp", "Grafana"]
+    node-exporter-9100-tcp = [9100, 9100, "tcp", "Node Exporter"]
 
     all-all       = [-1, -1, "-1", "All protocols"]
     all-tcp       = [0, 65535, "tcp", "All TCP ports"]

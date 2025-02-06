@@ -258,7 +258,6 @@ module "sns_notification" {
     }
   ]
 
-  # enable_default_topic_policy = true
   create_topic_policy = true
   topic_policy_statements = {
     allow_codepipeline = {
