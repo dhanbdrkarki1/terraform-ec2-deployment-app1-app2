@@ -29,6 +29,7 @@ resource "aws_s3_bucket" "this" {
       condition     = can(regex("^[a-z0-9][a-z0-9-]*[a-z0-9]$", local.bucket_name))
       error_message = "Bucket name must contain only lowercase letters, numbers, and hyphens, and must not start or end with a hyphen."
     }
+    prevent_destroy = false
   }
 
   tags = merge(

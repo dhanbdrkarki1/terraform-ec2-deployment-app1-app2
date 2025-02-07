@@ -11,7 +11,7 @@ aws_region   = "us-east-2"
 create_s3_remote_state = true
 bucket_name            = "remote-state"
 enable_versioning      = true
-force_destroy          = false
+force_destroy          = true
 create_bucket_policy   = false
 
 ####################
